@@ -1,0 +1,15 @@
+#foreach ($article in $articles)
+
+   <div class="sv-decoration-BlockVarningsruta sv-use-margins" style="margin:20px 0; position:relative; padding:20px 20px 20px 70px !important;">
+      <span style="position:absolute; top:25px; left:20px; display:inline-block; font-size:140%; padding:1px 15px; background:#DE492A; color:#fff; margin-right:10px;">!</span>
+
+      <p class="v-normal"><strong><span style="color:#DE492A; font-size:120%;">
+
+         VIKTIGT MEDDELANDE!</span></strong><br><strong>$article.getProperty("SV.Title").value</strong> <br> $article.getProperty("SV.Content").value
+
+      </p>
+      <a class="btn-yellow" href="$article.getProperty("URI").value">Läs mer</a>
+
+   </div>
+
+ #end

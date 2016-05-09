@@ -1,0 +1,40 @@
+#foreach($article in $articles)
+
+	## Hämta bild
+
+	#set($image = $article.getProperty("SV.Image").node)
+	$imageRenderer.update($image)
+   $imageRenderer.setStyle("")
+
+	## Fixa länk till bilden
+
+	#set($linkRenderer = $utils.linkRenderer)
+   #set($imageLink = $image.getProperty('URI'))
+   #set($imageLinkUrl = $imageLink.getString())
+
+	## Rendera bild
+
+	$imageRenderer.render()
+
+	## Hämta annan metadata
+
+	$article.getProperty("SV.Title").value
+	$article.getProperty("SV.Content").value
+
+	#set($user = $article.getProperty("myAuthor").node)
+
+	#set ($name = $propertyUtil.getString($user,'displayName',''))
+   #set ($title = $propertyUtil.getString($user,'title',''))
+   #set ($email = $propertyUtil.getString($user,'mail',''))
+   #set ($telephoneNumber = $propertyUtil.getString($user,'telephoneNumber',''))
+
+	$name
+	$email
+
+	<a class="btn-yellow" href="$article.getProperty("URI").value">Läs mer</a>
+
+	#set($externalLink = $article.getProperty("customLink").value)
+
+	<a class="btn-yellow" href="$externalLink">Till sidan</a>
+
+#end

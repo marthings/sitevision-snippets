@@ -1,0 +1,75 @@
+## ------------------------------------------
+## Undermenyn är uppdelad i 2 delar, och detta är del 2.
+## Mallen här har endast några modifieringar från standardmallen som används.
+## Den här mallen visar aktuell nivå, dvs antingen barnen till aktuell sida
+## Eller aktuell sida med sidorna på samma nivå, om aktuell sida inte har några undersidor.
+## ------------------------------------------
+#set ($propertyUtil = $sitevisionUtils.propertyUtil)
+#set ($nodeIteratorUtil = $sitevisionUtils.nodeIteratorUtil)
+#if ($propertyUtil.getNode($portlet, 'menuRoot'))
+   #set ($rootNode = $propertyUtil.getNode($portlet, 'menuRoot'))
+   #set ($pages = $nodeIteratorUtil.getMenuItems($rootNode))
+   #if ($pages.hasNext())
+      #set ($linkRenderer = $sitevisionUtils.linkRenderer)
+      #if (!$propertyUtil.getBoolean($portlet, 'useIcons'))
+         $linkRenderer.clearUseLinkDecorationSettings()
+         $linkRenderer.clearUseResourceDecorationSettings()
+      #end
+      #if ($propertyUtil.getBoolean($portlet, 'useImage'))
+         #set ($useImage = true)
+         #set ($imageURL = $propertyUtil.getNestedString($portlet, 'image', 'URI'))
+         #set ($imageWidth = $propertyUtil.getNestedInt($portlet, 'image', 'width'))
+         #set ($imagePadding = $imageWidth + 2)
+         $linkRenderer.setStyle("display:block; padding-left:${imagePadding}px")
+      #else
+         #set ($useImage = false)
+         $linkRenderer.setStyle("display:block")
+      #end
+      #set ($fontClass = $propertyUtil.getNestedString($portlet, 'normalFont', 'selectorText'))
+      #set ($activeFontClass = $propertyUtil.getNestedString($portlet, 'activeFont', 'selectorText', $fontClass))
+      #set ($currentPage = $sitevisionUtils.portletContextUtil.currentPage)
+
+      ## ---------------------------------------------------
+      ## Adjust $space to increase/decrease spacing between menu items
+      ## Adjust $imageTop to increase/decrease image top alignment
+      ## ---------------------------------------------------
+      #set ($space = "0.15em")
+      #set ($imageTop = "0.15em")
+
+      <ul class="sv-defaultlist">
+      #foreach ($p in $pages)
+         #if ($linkRenderer.isValidTarget($p))
+
+            ## variabeln $classes samlar ihop några css-klasser beroende på några
+            ## kontroller nedan, som sedan sätts på länkblocket.
+            #set($classes = "")
+            $linkRenderer.update($p)
+            #if ($p.equals($currentPage))
+               $linkRenderer.setFontClass($activeFontClass)
+               #set($classes = "$classes current")
+            #else
+               $linkRenderer.setFontClass($fontClass)
+            #end
+
+            ## Har sidan undersidor så ska den få css-klassen "has-children"
+            ## så att man kan stila den lämpligt
+            #if($nodeIteratorUtil.getMenuItems($p).hasNext())
+               #set($classes = "$classes has-children")
+            #end
+
+            #if ($useImage)
+               <li class="$classes" style="background-image:url($imageURL); background-repeat:no-repeat; background-position:0 ${imageTop}; padding:${space} 0 ${space} 0">
+            #else
+               <li class="$classes sv-inline">
+            #end
+
+
+            ## $linkRenderer.setStyle("padding-left: -3px;")
+
+            ## Rendera länken
+            $linkRenderer.render()</li>
+         #end
+      #end
+      </ul>
+   #end
+#end

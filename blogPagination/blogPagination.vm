@@ -1,0 +1,26 @@
+<div class="v-blog-nav">
+  #if($previousArticle)
+  <div class="v-blog-nav-prev">
+      <p class="v-normal">Föregående artikel</p>
+
+      $linkRenderer.update($previousArticle)
+      <h3 class="v-h3">$linkRenderer.render()</h3>
+  </div>
+  #else
+
+  #end
+
+  <div class="v-blog-nav-archive">
+   <a href="/blogg" class="v-h3">Arkiv</a>
+  </div>
+  #if($nextArticle)
+  <div class="v-blog-nav-next">
+      <p class="v-normal">Nästa artikel</p>
+
+      $linkRenderer.update($nextArticle)
+      <h3 class="v-h3">$linkRenderer.render()</h3>
+  </div>
+  #else
+
+   #end
+</div>

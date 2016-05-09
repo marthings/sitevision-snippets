@@ -1,0 +1,73 @@
+## ------------------------------------------
+## Undermenyn är uppdelad i 2 delar, och detta är del 1.
+## Den här delen hanterar de nivåer man bläddrat in i, så att säga.
+## Den utgår från första nivån, roten, som även visas i huvudmenyn, sedan följer den uppåt i strukturen enbart
+## och visar alltså bara aktuell sida eller de som kommer i direkt linje före.
+## ------------------------------------------
+
+## Hämta alla viktiga utils som behövs
+#set ($propertyUtil     = $sitevisionUtils.propertyUtil)
+#set ($nodeTreeUtil     = $sitevisionUtils.nodeTreeUtil)
+#set ($nodeIteratorUtil = $sitevisionUtils.nodeIteratorUtil)
+#set ($linkRenderer     = $sitevisionUtils.linkRenderer)
+#set ($currentPage      = $sitevisionUtils.portletContextUtil.currentPage)
+
+## Lite inställningar, t.ex. formatmallar som ska användas.
+#set ($useImage = false)
+#set ($fontClass = $propertyUtil.getNestedString($portlet, 'normalFont', 'selectorText'))
+#set ($activeFontClass = $propertyUtil.getNestedString($portlet, 'activeFont', 'selectorText', $fontClass))
+$linkRenderer.setStyle("display:block")
+$linkRenderer.setFontClass($fontClass)
+
+
+## Ett macro som hanterar renderingen av varje länk, så att man slipper massor av extra kod om man behöver rendera flera nivåer.
+#macro(menuItems $pages)
+   #foreach ($p in $pages)
+
+      ## Först kontrolleras så det är rätt länkar som vi är ute efter.
+      #if ($linkRenderer.isValidTarget($p))
+         #set($children                 = $nodeIteratorUtil.getMenuItems($p))
+         #set($isCurrentPage            = $p.equals($currentPage))
+         #set($isParent                 = $children.hasNext())
+         #set($isDescendantOfCurrentPage = $nodeTreeUtil.isDescendantOf($currentPage, $p))
+
+         #if(($isCurrentPage && $isParent) || (!$isCurrentPage && $isDescendantOfCurrentPage))
+
+            ## Är det aktuell sida, så sätt formatmallen för aktiv sida.
+            #if($isCurrentPage)
+               $linkRenderer.setFontClass($activeFontClass)
+            #end
+
+            ## Rendera länken i menyn
+            $linkRenderer.update($p)
+            $linkRenderer.setStyle("display: block; padding-bottom: 15px;")
+            <li class="sv-inline">
+               $linkRenderer.render()
+            </li>
+
+            ## Om sidan är förälder så anropa macrot igen, så att vi kan fortsätta med nästa nivå.
+            #if( $isParent )
+               #menuItems( $children )
+            #end
+
+         #end
+
+      #end
+   #end
+#end
+
+
+## Här är ingången för koden
+#if ($propertyUtil.getNode($portlet, 'menuRoot'))
+
+   ## Vi hämtar först ut rootnivå, och sedan körs macrot som defineras ovan.
+   #set ($rootNode = $propertyUtil.getNode($portlet, 'menuRoot'))
+   #set ($pages = $nodeIteratorUtil.getMenuItems($rootNode))
+   #if ($pages.hasNext())
+
+      <ul class="sv-defaultlist">
+         #menuItems($pages)
+      </ul>
+
+   #end
+#end

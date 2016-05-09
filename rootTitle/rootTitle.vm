@@ -1,0 +1,14 @@
+## Kolla först så att sidan har metadata menyval
+#if ($currentPage.hasProperty("rootTitle"))
+
+    ## Hämta nuvarande sidas metadata menyval
+    #set ($rootTitle = $currentPage.getProperty("rootTitle").node)
+
+    ## Hämta namnet på sidan för metadatat menyval
+    #set ($rootName = $propertyUtil.getString($rootTitle, 'displayName', $rootTitle.toString()))
+
+    ## Skriv ut namnet
+    <div class="sv-use-margins" style="padding-bottom:20px">
+      <h1 class="v-h1" style="margin:0">$rootName</h1>
+    </div>
+#end

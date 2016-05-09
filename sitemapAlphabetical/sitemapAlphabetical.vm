@@ -1,0 +1,70 @@
+## ==================================================
+## Copyright (C) SiteVision 2011, all rights reserved
+## This portlet uses the SiteVision Public API
+## ==================================================
+#set ($propertyUtil = $sitevisionUtils.propertyUtil)
+#if ($propertyUtil.getNode($portlet, 'menuRoot'))
+   #set ($rootNode = $propertyUtil.getNode($portlet, 'menuRoot'))
+   #set ($pages = $sitevisionUtils.nodeIteratorUtil.getMenuItems($rootNode))
+   #if ($pages.hasNext())
+      #set ($linkRenderer = $sitevisionUtils.linkRenderer)
+      #if (!$propertyUtil.getBoolean($portlet, 'useIcons'))
+         $linkRenderer.clearUseLinkDecorationSettings()
+         $linkRenderer.clearUseResourceDecorationSettings()
+      #end
+      #if ($propertyUtil.getBoolean($portlet, 'useImage'))
+         #set ($useImage = true)
+         #set ($imageURL = $propertyUtil.getNestedString($portlet, 'image', 'URI'))
+         #set ($imageWidth = $propertyUtil.getNestedInt($portlet, 'image', 'width'))
+         #set ($imagePadding = $imageWidth + 2)
+         $linkRenderer.setStyle("display:block; padding-left:${imagePadding}px")
+      #else
+         #set ($useImage = false)
+         $linkRenderer.setStyle("display:block")
+      #end
+      #set ($fontClass = $propertyUtil.getNestedString($portlet, 'normalFont', 'selectorText'))
+      #set ($activeFontClass = $propertyUtil.getNestedString($portlet, 'activeFont', 'selectorText', $fontClass))
+      #set ($currentPage = $sitevisionUtils.portletContextUtil.currentPage)
+
+      ## ---------------------------------------------------
+      ## Adjust $space to increase/decrease spacing between menu items
+      ## Adjust $imageTop to increase/decrease image top alignment
+      ## ---------------------------------------------------
+      #set ($space = "0.25em")
+      #set ($imageTop = "0.15em")
+
+      #set ($first_char = "")
+      #set ($char = "")
+
+      <ul class="sv-defaultlist ao-group-list">
+      #foreach ($p in $pages)
+         #if ($linkRenderer.isValidTarget($p))
+            $linkRenderer.update($p)
+
+            #set ($first_char = $p.toString().substring(0,1).toUpperCase())
+
+            #if (!$char.equals($first_char))
+                <div style="clear:both;"></div>
+                <li class="ao-heading"><h3>$first_char</h3></li>
+                <div style="clear:both;"></div>
+            #end
+
+            #if ($p.equals($currentPage))
+               $linkRenderer.setFontClass($activeFontClass)
+            #else
+               $linkRenderer.setFontClass($fontClass)
+            #end
+            #if ($useImage)
+               <li class="ao-group" style="background-image:url($imageURL); background-repeat:no-repeat; background-position:10px ${imageTop}; padding:${space} 0 ${space} 15px">
+            #else
+               <li>
+            #end
+            $linkRenderer.render()</li>
+
+            #set ($char = $first_char)
+
+         #end
+      #end
+      </ul>
+   #end
+#end

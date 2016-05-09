@@ -1,0 +1,53 @@
+## Detta är det mest yttre lagret bara.
+## I denna ul skrivs bilderna ut, samt bildtexten.
+
+
+<div class="main-slider flexslider">
+   <ul class="slides">
+
+      #foreach($article in $articles)
+
+         #set($image = $article.getProperty("SV.Image").node)
+         #set($customlink = $article.getProperty("SV.customLink").node)
+         #set ($linkRenderer = $utils.linkRenderer)
+         #set ($font = 'normal')
+
+         $imageRenderer.update($image)
+         $imageRenderer.setStyle("")
+         ## Vi behöver bildens länk
+         #set($link = $image.getProperty('URI'))
+         #set($linkUrl = $link.getString())
+
+         ## Init
+          #set ($currentPage = $article)
+
+         <li class="slider-item slider-item-$velocityCount">
+
+
+               ## Puffen renderas, med eventuell bildtext
+               <div class="slider-image" style="background: url($linkUrl)">
+                  $imageRenderer.render()
+               </div>
+               <div class="slider-caption">
+                  <div class="slider-caption-inner">
+                     <h2 class="subheading">$article.getProperty("SV.Title").value</h2>
+                     <p class="normal">$article.getProperty("SV.Content").value</p>
+
+                     <p class="blaxknapp">
+
+                     #set ($linkName = $utils.getString($customlink, 'displayName', $customlink.toString()))
+
+                     $linkRenderer.update($customlink, $font, $linkName)
+
+                     $linkRenderer.render()
+
+                     </p>
+
+
+                  </div>
+               </div>
+         </li>
+      #end
+
+   </ul> ## /ul.slides
+</div>

@@ -1,0 +1,62 @@
+## ==================================================
+## Copyright (C) SiteVision 2011, all rights reserved
+## This portlet uses the SiteVision Public API
+## ==================================================
+#set ($propertyUtil = $sitevisionUtils.propertyUtil)
+#set ($nodeTreeUtil     = $sitevisionUtils.nodeTreeUtil)
+#set ($nodeIteratorUtil = $sitevisionUtils.nodeIteratorUtil)
+
+#if ($propertyUtil.getNode($portlet, 'menuRoot'))
+   #set ($rootNode = $propertyUtil.getNode($portlet, 'menuRoot'))
+   #set ($pages = $sitevisionUtils.nodeIteratorUtil.getMenuItems($rootNode))
+   #if ($pages.hasNext())
+      ## ---------------------------------------------------
+      ## Adjust $space to increase/decrease spacing between menu items
+      ## ---------------------------------------------------
+      #set ($space = "0.15em")
+
+      #set ($linkRenderer = $sitevisionUtils.linkRenderer)
+      #if (!$propertyUtil.getBoolean($portlet, 'useIcons'))
+         $linkRenderer.clearUseLinkDecorationSettings()
+         $linkRenderer.clearUseResourceDecorationSettings()
+      #end
+      #set ($fontClass = $propertyUtil.getNestedString($portlet, 'normalFont', 'selectorText'))
+      #if ($propertyUtil.getBoolean($portlet, 'useImage'))
+         #set($doubleQuote = '"')
+         #set ($imageURL = $propertyUtil.getNestedString($portlet, 'image', 'URI'))
+         #set ($icon = "<img alt=${doubleQuote}${doubleQuote} src=${doubleQuote}${imageURL}${doubleQuote} style=${doubleQuote}vertical-align:middle; margin-left:${space}${doubleQuote} />")
+         #set ($ignoreFirstImage = false)
+      #else
+         #set($doubleQuote = '"')
+         #set ($icon = "<span class=${doubleQuote}$fontClass${doubleQuote} style=${doubleQuote}vertical-align:middle; margin-left:${space}${doubleQuote}>| </span>")
+         #set ($ignoreFirstImage = true)
+      #end
+      #set ($activeFontClass = $propertyUtil.getNestedString($portlet, 'activeFont', 'selectorText', $fontClass))
+      #set ($currentPage = $sitevisionUtils.portletContextUtil.currentPage)
+
+      #set ($style = "vertical-align:middle; margin-left:${space}")
+      $linkRenderer.setStyle($style)
+      <ul class="v-main-navigation-items" style="display:inline; padding-left:0; margin-left:0; list-style:none">
+      #foreach ($p in $pages)
+         #if ($linkRenderer.isValidTarget($p))
+         	#set($children = $nodeIteratorUtil.getMenuItems($p))
+         	#set($isDescendantOfCurrentPage = $nodeTreeUtil.isDescendantOf($currentPage, $p))
+            $linkRenderer.update($p)
+            #if ($p.equals($currentPage))
+               $linkRenderer.setFontClass($activeFontClass)
+         	#elseif ($isDescendantOfCurrentPage)
+         		$linkRenderer.setFontClass($activeFontClass)
+            #else
+               $linkRenderer.setFontClass($fontClass)
+            #end
+            #if ($ignoreFirstImage)
+               <li class="sv-inline">$linkRenderer.render()</li>
+               #set ($ignoreFirstImage = false)
+            #else
+               <li class="sv-inline">$linkRenderer.render()</li>
+            #end
+         #end
+      #end
+      </ul>
+   #end
+#end
